@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AromaCafe – Sklep z kawą</title>
+  <meta name="description" content="Szablon sklepu internetowego z kawą – nowoczesny, responsywny layout z koszykiem i filtrowaniem produktów." />
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style>
+    /* Drobne poprawki dla paska przewijania koszyka */
+    .scrollbar-thin::-webkit-scrollbar { width: 6px; }
+    .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+    .scrollbar-thin::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.7); border-radius: 9999px; }
+  </style>
+</head>
+<body class="min-h-screen bg-stone-100 text-stone-900">
+  <!-- Overlay koszyka -->
+  <div id="cart-backdrop" class="fixed inset-0 bg-black/40 opacity-0 pointer-events-none transition-opacity z-30"></div>
+
+  <!-- Panel koszyka -->
+  <aside id="cart-panel" class="fixed inset-y-0 right-0 max-w-md w-full bg-white shadow-2xl translate-x-full transition-transform z-40 flex flex-col">
+    <header class="px-6 py-4 border-b border-stone-200 flex items-center justify-between">
+      <h2 class="text-lg font-semibold tracking-tight">Twój koszyk</h2>
+      <button id="close-cart" class="p-2 rounded-full hover:bg-stone-100 text-stone-500" aria-label="Zamknij koszyk">
+        ✕
+      </button>
+    </header>
+    <div id="cart-items" class="flex-1 overflow-y-auto px-6 py-4 space-y-4 scrollbar-thin">
+      <p class="text-sm text-stone-500">Koszyk jest pusty. Dodaj pierwszą kawę!</p>
+    </div>
+    <footer class="border-t border-stone-200 px-6 py-4 space-y-3">
+      <div class="flex items-center justify-between text-sm">
+        <span class="text-stone-500">Suma</span>
+        <span id="cart-total" class="font-semibold">0,00 zł</span>
+      </div>
+      <button class="w-full bg-amber-700 hover:bg-amber-800 text-white py-2.5 rounded-lg font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed" id="checkout-btn" disabled>
+        Przejdź do zamówienia
+      </button>
+      <p class="text-[11px] text-stone-400 text-center">Szablon demonstracyjny – przycisk nie składa rzeczywistego zamówienia.</p>
+    </footer>
+  </aside>
+
+  <!-- Główna zawartość -->
+  <div class="relative z-10">
+    <!-- Pasek nawigacji -->
+    <header class="sticky top-0 z-20 bg-stone-100/90 backdrop-blur border-b border-stone-200/80">
+      <nav class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+        <div class="flex items-center gap-2">
+          <div class="w-9 h-9 rounded-full bg-gradient-to-br from-amber-700 to-amber-500 flex items-center justify-center text-white font-semibold text-xl">☕</div>
+          <div>
+            <div class="text-base font-semibold tracking-tight">AromaCafe</div>
+            <div class="text-[11px] uppercase tracking-[0.18em] text-stone-500">Specialty Coffee</div>
+          </div>
+        </div>
+        <div class="hidden md:flex items-center gap-8 text-sm font-medium">
+          <a href="#hero" class="text-stone-700 hover:text-amber-800">Start</a>
+          <a href="#products" class="text-stone-700 hover:text-amber-800">Sklep</a>
+          <a href="#about" class="text-stone-700 hover:text-amber-800">O nas</a>
+          <a href="#contact" class="text-stone-700 hover:text-amber-800">Kontakt</a>
+        </div>
+        <div class="flex items-center gap-3">
+          <button id="open-cart" class="relative flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-stone-200 hover:border-amber-600 text-xs font-medium shadow-sm">
+            <span class="text-lg">🛒</span>
+            <span class="hidden sm:inline">Koszyk</span>
+            <span id="cart-count" class="inline-flex items-center justify-center min-w-[22px] h-[22px] rounded-full bg-amber-700 text-white text-[11px] px-1">0</span>
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+      <!-- Hero -->
+      <section id="hero" class="grid md:grid-cols-2 gap-10 items-center pt-10 sm:pt-16 pb-10">
+        <div class="space-y-5">
+          <p class="inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.25em] text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-3 py-1 w-fit">
+            Nowa kolekcja palarni rzemieślniczych
+          </p>
+          <h1 class="text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight text-stone-900">
+            Odkryj kawy, które budzą nie tylko poranki.
+          </h1>
+          <p class="text-sm sm:text-base text-stone-600 leading-relaxed max-w-xl">
+            AromaCafe to szablon sklepu online dla miłośników kawy specialty. Prezentuj ziarna z najlepszych palarni, opowiadaj ich historię i pozwól klientom wygodnie zamawiać ulubione mieszanki.
+          </p>
+          <div class="flex flex-wrap items-center gap-3">
+            <a href="#products" class="inline-flex items-center justify-center px-4 py-2.5 rounded-full bg-amber-700 hover:bg-amber-800 text-white text-sm font-semibold shadow-sm">
+              Przeglądaj kawy
+            </a>
+            <a href="#about" class="inline-flex items-center justify-center px-4 py-2.5 rounded-full border border-stone-300 hover:border-amber-700 text-sm font-medium text-stone-800 bg-white">
+              Poznaj koncept
+            </a>
+          </div>
+          <div class="flex flex-wrap items-center gap-6 pt-2 text-xs text-stone-500">
+            <div>
+              <div class="font-semibold text-stone-800">Świeże palenie</div>
+              <div>przesyłka do 48h od wypalenia</div>
+            </div>
+            <div>
+              <div class="font-semibold text-stone-800">Darmowa dostawa</div>
+              <div>od 149 zł w koszyku</div>
+            </div>
+          </div>
+        </div>
+        <div class="relative">
+          <div class="absolute -inset-6 bg-gradient-to-br from-amber-200/70 via-transparent to-stone-100 rounded-[32px] -z-10"></div>
+          <div class="bg-white rounded-[28px] shadow-lg border border-stone-200/80 p-6 flex flex-col gap-4">
+            <div class="flex items-center justify-between mb-2">
+              <div>
+                <h3 class="text-sm font-semibold tracking-tight">Zestaw startowy baristy</h3>
+                <p class="text-xs text-stone-500">Idealny punkt wyjścia do Twojego sklepu</p>
+              </div>
+              <span class="inline-flex items-center rounded-full bg-emerald-50 text-emerald-700 text-[11px] font-medium px-2.5 py-1 border border-emerald-100">Bestseller</span>
+            </div>
+            <div class="grid grid-cols-3 gap-3 text-[11px] text-stone-600">
+              <div class="col-span-2 space-y-1">
+                <div class="flex items-center justify-between">
+                  <span>Konfiguracja produktów</span>
+                  <span class="text-emerald-700 font-semibold">✓</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span>Koszyk z podglądem</span>
+                  <span class="text-emerald-700 font-semibold">✓</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span>Filtrowanie i wyszukiwarka</span>
+                  <span class="text-emerald-700 font-semibold">✓</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span>Responsywny design</span>
+                  <span class="text-emerald-700 font-semibold">✓</span>
+                </div>
+              </div>
+              <div class="col-span-1 flex flex-col justify-between items-end text-right">
+                <div>
+                  <div class="text-[11px] uppercase tracking-[0.16em] text-stone-400">Cena szablonu</div>
+                  <div class="text-xl font-semibold text-stone-900">0 zł</div>
+                  <div class="text-[11px] text-stone-500">możesz dowolnie rozwijać</div>
+                </div>
+                <div class="text-[10px] text-stone-400 mt-2">Zastąp ten box własną ofertą lub banerem promocyjnym.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Filtry i wyszukiwarka -->
+      <section id="products" class="pt-4 sm:pt-6">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-4">
+          <div>
+            <h2 class="text-xl sm:text-2xl font-semibold tracking-tight mb-1">Sklep z kawą</h2>
+            <p class="text-sm text-stone-600 max-w-md">Przykładowa lista produktów. W swoim projekcie możesz podpiąć dane z CMS, pliku JSON lub API sklepu.</p>
+          </div>
+          <div class="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-end">
+            <div class="relative w-full sm:w-64">
+              <span class="absolute inset-y-0 left-3 flex items-center text-stone-400 text-sm">🔍</span>
+              <input id="search-input" type="text" placeholder="Szukaj kawy lub kraju pochodzenia" class="w-full pl-8 pr-3 py-2 rounded-full border border-stone-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-600 focus:border-amber-600 bg-white" />
+            </div>
+            <select id="sort-select" class="w-full sm:w-44 border border-stone-300 rounded-full px-3 py-2 text-xs sm:text-sm bg-white focus:outline-none focus:ring-2 focus:ring-amber-600">
+              <option value="recommended">Polecane</option>
+              <option value="price-asc">Cena: od najniższej</option>
+              <option value="price-desc">Cena: od najwyższej</option>
+              <option value="rating-desc">Ocena: najwyższa</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2 mb-5 text-xs">
+          <button data-filter-type="category" data-filter-value="all" class="filter-chip px-3 py-1.5 rounded-full border border-stone-300 bg-white text-stone-700 font-medium hover:border-amber-700">Wszystkie</button>
+          <button data-filter-type="category" data-filter-value="single" class="filter-chip px-3 py-1.5 rounded-full border border-stone-200 bg-stone-50 text-stone-700 hover:border-amber-700">Single origin</button>
+          <button data-filter-type="category" data-filter-value="blend" class="filter-chip px-3 py-1.5 rounded-full border border-stone-200 bg-stone-50 text-stone-700 hover:border-amber-700">Blend</button>
+          <button data-filter-type="roast" data-filter-value="light" class="filter-chip px-3 py-1.5 rounded-full border border-stone-200 bg-stone-50 text-stone-700 hover:border-amber-700">Jasne palenie</button>
+          <button data-filter-type="roast" data-filter-value="medium" class="filter-chip px-3 py-1.5 rounded-full border border-stone-200 bg-stone-50 text-stone-700 hover:border-amber-700">Średnie</button>
+          <button data-filter-type="roast" data-filter-value="dark" class="filter-chip px-3 py-1.5 rounded-full border border-stone-200 bg-stone-50 text-stone-700 hover:border-amber-700">Ciemne</button>
+          <button data-filter-type="feature" data-filter-value="espresso" class="filter-chip px-3 py-1.5 rounded-full border border-stone-200 bg-stone-50 text-stone-700 hover:border-amber-700">Do espresso</button>
+          <button data-filter-type="feature" data-filter-value="filter" class="filter-chip px-3 py-1.5 rounded-full border border-stone-200 bg-stone-50 text-stone-700 hover:border-amber-700">Do przelewu</button>
+        </div>
+
+        <!-- Lista produktów -->
+        <div id="products-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-4"></div>
+        <p id="products-empty" class="hidden text-sm text-stone-500 text-center py-6">Brak produktów dla wybranych filtrów. Wyczyść filtry lub zmień kryteria wyszukiwania.</p>
+      </section>
+
+      <!-- Sekcja o nas -->
+      <section id="about" class="mt-10 sm:mt-14 grid md:grid-cols-2 gap-10 items-start">
+        <div class="space-y-4">
+          <h2 class="text-xl sm:text-2xl font-semibold tracking-tight">O koncepcie sklepu</h2>
+          <p class="text-sm text-stone-600 leading-relaxed">
+            Ten szablon został zaprojektowany z myślą o małych palarniach i kawiarniach, które chcą szybko uruchomić sprzedaż online. Zamiast gotowego systemu e‑commerce otrzymujesz lekki, czytelny front‑end, który możesz połączyć z dowolnym zapleczem (np. headless CMS, systemem płatności lub platformą sklepową).
+          </p>
+          <p class="text-sm text-stone-600 leading-relaxed">
+            Sekcje i komponenty są zbudowane w oparciu o Tailwind CSS, dzięki czemu łatwo dostosujesz kolory, spacing i typografię do identyfikacji wizualnej swojej marki.
+          </p>
+          <ul class="text-sm text-stone-600 space-y-2">
+            <li class="flex gap-2"><span class="mt-0.5">➜</span><span>Dynamicznie generowana lista produktów z jednego źródła danych.</span></li>
+            <li class="flex gap-2"><span class="mt-0.5">➜</span><span>Proste filtrowanie, wyszukiwarka i sortowanie po cenie oraz ocenie.</span></li>
+            <li class="flex gap-2"><span class="mt-0.5">➜</span><span>Lekki koszyk w panelu bocznym gotowy do integracji z płatnościami.</span></li>
+          </ul>
+        </div>
+        <div class="bg-white rounded-2xl border border-stone-200/80 shadow-sm p-5 sm:p-6 space-y-4">
+          <h3 class="text-sm font-semibold tracking-tight mb-1">Jak zaadaptować ten szablon?</h3>
+          <ol class="list-decimal list-inside text-sm text-stone-600 space-y-2">
+            <li>Zastąp przykładowe produkty w sekcji skryptu własną listą.</li>
+            <li>Podłącz obsługę zamówień: formularz checkout lub API płatności.</li>
+            <li>Dodaj system logowania klientów, jeżeli go potrzebujesz.</li>
+            <li>Uzupełnij sekcje „O nas” i „Kontakt” prawdziwymi danymi.</li>
+          </ol>
+          <p class="text-xs text-stone-500 pt-1">
+            Cały layout mieści się w jednym pliku <code class="px-1 py-0.5 rounded bg-stone-100 border border-stone-200 text-[11px]">index.html</code>, więc łatwo przeniesiesz go do ulubionego frameworka lub motywu.
+          </p>
+        </div>
+      </section>
+
+      <!-- Kontakt / stopka -->
+      <section id="contact" class="mt-12 sm:mt-16 border-t border-stone-200 pt-8">
+        <div class="grid md:grid-cols-[minmax(0,2fr)_minmax(0,1.4fr)] gap-10 items-start">
+          <div class="space-y-3">
+            <h2 class="text-lg sm:text-xl font-semibold tracking-tight">Kontakt</h2>
+            <p class="text-sm text-stone-600 max-w-md">
+              Użyj tej sekcji, aby podać dane swojej palarni, numer telefonu, adres kawiarni lub formularz kontaktowy. Poniżej znajdziesz prosty formularz, który możesz zintegrować z backendem lub usługą typu form‑to‑email.
+            </p>
+            <div class="text-xs text-stone-500 space-y-1">
+              <p><span class="font-semibold text-stone-700">Przykładowa palarnia:</span> ul. Kawowa 12, 00‑000 Warszawa</p>
+              <p>pon‑pt 9:00‑18:00, sob 10:00‑15:00</p>
+            </div>
+          </div>
+          <form class="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-3 text-sm">
+            <div class="grid sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-medium text-stone-600 mb-1">Imię</label>
+                <input type="text" class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-600" placeholder="Twoje imię" />
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-stone-600 mb-1">E‑mail</label>
+                <input type="email" class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-600" placeholder="nazwa@domena.pl" />
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-stone-600 mb-1">Wiadomość</label>
+              <textarea rows="3" class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-600" placeholder="Napisz, w czym możemy pomóc..."></textarea>
+            </div>
+            <button type="button" class="w-full inline-flex items-center justify-center px-4 py-2.5 rounded-lg bg-stone-900 hover:bg-stone-950 text-white font-medium text-sm">
+              Wyślij (demo)
+            </button>
+            <p class="text-[11px] text-stone-400">Formularz jest przykładowy – dodaj własną logikę obsługi po stronie serwera.</p>
+          </form>
+        </div>
+        <footer class="mt-8 pt-4 border-t border-stone-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-stone-500">
+          <p>© <span id="year"></span> AromaCafe – szablon sklepu z kawą.</p>
+          <p>Stworzono z użyciem Tailwind CSS. Dostosuj kolory i treści do swojej marki.</p>
+        </footer>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // Dane przykładowych produktów
+    const products = [
+      {
+        id: 1,
+        name: "Kenya Kirinyaga",
+        description: "Soczysta, owocowa kawa z nutami porzeczki, czerwonej pomarańczy i karmelu.",
+        country: "Kenia",
+        category: "single",
+        roast: "light",
+        feature: "filter",
+        process: "Washed",
+        tasting: ["porzeczka", "cytrusy", "karmel"],
+        price: 54,
+        oldPrice: 59,
+        rating: 4.8,
+        grams: 250,
+        tag: "Nowość"
+      },
+      {
+        id: 2,
+        name: "Brasil Cerrado Sweet",
+        description: "Klasyczny, czekoladowy profil idealny do mlecznych kaw.",
+        country: "Brazylia",
+        category: "single",
+        roast: "medium",
+        feature: "espresso",
+        process: "Natural",
+        tasting: ["czekolada", "orzech", "karmel"],
+        price: 39,
+        oldPrice: null,
+        rating: 4.6,
+        grams: 250,
+        tag: "Do latte"
+      },
+      {
+        id: 3,
+        name: "House Blend No. 1",
+        description: "Zbalansowany blend do codziennego espresso w kawiarni i domu.",
+        country: "Brazylia / Kolumbia",
+        category: "blend",
+        roast: "medium",
+        feature: "espresso",
+        process: "Mix",
+        tasting: ["kakao", "wanilia", "orzech"],
+        price: 42,
+        oldPrice: 46,
+        rating: 4.7,
+        grams: 1000,
+        tag: "Bestseller"
+      },
+      {
+        id: 4,
+        name: "Ethiopia Yirgacheffe",
+        description: "Delikatna, kwiatowa kawa z nutami jaśminu i brzoskwini.",
+        country: "Etiopia",
+        category: "single",
+        roast: "light",
+        feature: "filter",
+        process: "Washed",
+        tasting: ["jaśmin", "brzoskwinia", "herbata"],
+        price: 52,
+        oldPrice: null,
+        rating: 4.9,
+        grams: 250,
+        tag: "Limited"
+      },
+      {
+        id: 5,
+        name: "Italian Roast Classic",
+        description: "Mocno palona mieszanka z intensywną goryczką i niską kwasowością.",
+        country: "Mieszanka",
+        category: "blend",
+        roast: "dark",
+        feature: "espresso",
+        process: "Mix",
+        tasting: ["gorzka czekolada", "dym", "przyprawy"],
+        price: 35,
+        oldPrice: null,
+        rating: 4.3,
+        grams: 500,
+        tag: "Klasyka"
+      },
+      {
+        id: 6,
+        name: "Colombia Huila",
+        description: "Słodka kawa z nutami mlecznej czekolady i czerwonych owoców.",
+        country: "Kolumbia",
+        category: "single",
+        roast: "medium",
+        feature: "filter",
+        process: "Washed",
+        tasting: ["mleczna czekolada", "wiśnia", "orzech"],
+        price: 44,
+        oldPrice: null,
+        rating: 4.5,
+        grams: 250,
+        tag: "Polecana"
+      }
+    ];
+
+    // Stan aplikacji
+    const state = {
+      filters: {
+        category: "all",
+        roast: null,
+        feature: null,
+      },
+      search: "",
+      sort: "recommended",
+      cart: [], // { productId, quantity }
+    };
+
+    // Elementy DOM
+    const productsGrid = document.getElementById("products-grid");
+    const productsEmpty = document.getElementById("products-empty");
+    const searchInput = document.getElementById("search-input");
+    const sortSelect = document.getElementById("sort-select");
+    const filterChips = document.querySelectorAll(".filter-chip");
+    const cartBackdrop = document.getElementById("cart-backdrop");
+    const cartPanel = document.getElementById("cart-panel");
+    const openCartBtn = document.getElementById("open-cart");
+    const closeCartBtn = document.getElementById("close-cart");
+    const cartCount = document.getElementById("cart-count");
+    const cartItemsContainer = document.getElementById("cart-items");
+    const cartTotal = document.getElementById("cart-total");
+    const checkoutBtn = document.getElementById("checkout-btn");
+    const yearSpan = document.getElementById("year");
+
+    // Funkcje pomocnicze
+    function formatPrice(value) {
+      return value.toFixed(2).replace(".", ",") + " zł";
+    }
+
+    function getProductById(id) {
+      return products.find((p) => p.id === id);
+    }
+
+    function applyFiltersAndSearch() {
+      let filtered = [...products];
+
+      const { category, roast, feature } = state.filters;
+      const search = state.search.trim().toLowerCase();
+
+      if (category && category !== "all") {
+        filtered = filtered.filter((p) => p.category === category);
+      }
+      if (roast) {
+        filtered = filtered.filter((p) => p.roast === roast);
+      }
+      if (feature) {
+        filtered = filtered.filter((p) => p.feature === feature);
+      }
+      if (search) {
+        filtered = filtered.filter((p) => {
+          const haystack = `${p.name} ${p.country} ${p.tasting.join(" ")}`.toLowerCase();
+          return haystack.includes(search);
+        });
+      }
+
+      switch (state.sort) {
+        case "price-asc":
+          filtered.sort((a, b) => a.price - b.price);
+          break;
+        case "price-desc":
+          filtered.sort((a, b) => b.price - a.price);
+          break;
+        case "rating-desc":
+          filtered.sort((a, b) => b.rating - a.rating);
+          break;
+        case "recommended":
+        default:
+          filtered.sort((a, b) => b.rating - a.rating || a.price - b.price);
+      }
+
+      return filtered;
+    }
+
+    function renderProducts() {
+      const list = applyFiltersAndSearch();
+
+      productsGrid.innerHTML = "";
+
+      if (!list.length) {
+        productsEmpty.classList.remove("hidden");
+        return;
+      } else {
+        productsEmpty.classList.add("hidden");
+      }
+
+      list.forEach((product) => {
+        const card = document.createElement("article");
+        card.className = "group bg-white rounded-2xl border border-stone-200/80 shadow-sm hover:shadow-md transition-shadow flex flex-col";
+
+        const roastLabelMap = {
+          light: "Jasne palenie",
+          medium: "Średnie palenie",
+          dark: "Ciemne palenie",
+        };
+
+        card.innerHTML = `
+          <div class="p-4 flex-1 flex flex-col">
+            <div class="flex items-start justify-between gap-2 mb-2">
+              <div class="text-[11px] text-stone-500 flex flex-col gap-0.5">
+                <span>${product.country}</span>
+                <span class="inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.18em] text-stone-400">
+                  ${product.category === "single" ? "Single origin" : "Blend"}
+                  <span class="w-1 h-1 rounded-full bg-stone-300"></span>
+                  ${roastLabelMap[product.roast] || "Kawa"}
+                </span>
+              </div>
+              <div class="flex flex-col items-end gap-1">
+                <span class="inline-flex items-center rounded-full bg-amber-50 text-amber-800 border border-amber-100 px-2 py-0.5 text-[10px] font-medium">${product.tag}</span>
+                <span class="inline-flex items-center gap-0.5 text-[11px] text-amber-700"><span>★</span><span class="font-medium">${product.rating.toFixed(1)}</span></span>
+              </div>
+            </div>
+            <h3 class="text-sm font-semibold tracking-tight mb-1.5 text-stone-900">${product.name}</h3>
+            <p class="text-xs text-stone-600 leading-relaxed mb-3">${product.description}</p>
+            <div class="flex flex-wrap gap-1.5 mb-3">
+              ${product.tasting
+                .map(
+                  (note) => `<span class="px-2 py-0.5 rounded-full bg-stone-100 text-stone-700 text-[10px] border border-stone-200">${note}</span>`
+                )
+                .join("")}
+            </div>
+            <div class="flex items-center justify-between mt-auto pt-2">
+              <div class="text-xs text-stone-500">
+                <div class="text-[11px] uppercase tracking-[0.16em] mb-0.5">Opakowanie</div>
+                <div class="font-medium text-stone-800">${product.grams} g</div>
+              </div>
+              <div class="text-right">
+                <div class="flex items-center gap-1 justify-end">
+                  <span class="text-sm font-semibold text-stone-900">${formatPrice(product.price)}</span>
+                  ${product.oldPrice ? `<span class="text-[11px] text-stone-400 line-through">${formatPrice(product.oldPrice)}</span>` : ""}
+                </div>
+                <div class="text-[10px] text-stone-500">${(product.price / (product.grams / 1000)).toFixed(0)} zł / kg</div>
+              </div>
+            </div>
+          </div>
+          <div class="px-4 pb-4 pt-1 flex items-center justify-between gap-2 border-t border-stone-200/80">
+            <div class="inline-flex items-center gap-1.5 text-[11px] text-stone-500">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              <span>Wysyłka w 24‑48 h</span>
+            </div>
+            <button data-add-to-cart="${product.id}" class="inline-flex items-center justify-center px-3 py-1.5 rounded-full bg-stone-900 text-white text-[11px] font-medium hover:bg-stone-950">
+              Dodaj do koszyka
+            </button>
+          </div>
+        `;
+
+        productsGrid.appendChild(card);
+      });
+    }
+
+    function renderCart() {
+      cartItemsContainer.innerHTML = "";
+
+      if (!state.cart.length) {
+        cartItemsContainer.innerHTML = '<p class="text-sm text-stone-500">Koszyk jest pusty. Dodaj pierwszą kawę!</p>';
+        cartTotal.textContent = formatPrice(0);
+        cartCount.textContent = "0";
+        checkoutBtn.disabled = true;
+        return;
+      }
+
+      let total = 0;
+      const fragment = document.createDocumentFragment();
+
+      state.cart.forEach((item) => {
+        const product = getProductById(item.productId);
+        if (!product) return;
+        const itemTotal = product.price * item.quantity;
+        total += itemTotal;
+
+        const row = document.createElement("div");
+        row.className = "flex gap-3 items-start border-b border-stone-200 pb-3 last:border-0 last:pb-0";
+
+        row.innerHTML = `
+          <div class="flex-1">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <div class="text-xs font-medium text-stone-900 mb-0.5">${product.name}</div>
+                <div class="text-[11px] text-stone-500 mb-1">${product.country} • ${product.grams} g</div>
+                <div class="text-[11px] text-stone-600">${formatPrice(product.price)} / opak.</div>
+              </div>
+              <button data-remove-from-cart="${product.id}" class="text-[11px] text-stone-400 hover:text-stone-700">Usuń</button>
+            </div>
+            <div class="flex items-center justify-between mt-2">
+              <div class="inline-flex items-center border border-stone-200 rounded-full text-[11px] overflow-hidden">
+                <button data-qty-dec="${product.id}" class="px-2 py-1 text-stone-500 hover:bg-stone-100">-</button>
+                <span class="px-2 py-1 min-w-[24px] text-center text-stone-800">${item.quantity}</span>
+                <button data-qty-inc="${product.id}" class="px-2 py-1 text-stone-500 hover:bg-stone-100">+</button>
+              </div>
+              <div class="text-[11px] font-medium text-stone-900">${formatPrice(itemTotal)}</div>
+            </div>
+          </div>
+        `;
+
+        fragment.appendChild(row);
+      });
+
+      cartItemsContainer.appendChild(fragment);
+      cartTotal.textContent = formatPrice(total);
+      cartCount.textContent = state.cart.reduce((sum, item) => sum + item.quantity, 0).toString();
+      checkoutBtn.disabled = false;
+    }
+
+    function addToCart(productId) {
+      const existing = state.cart.find((item) => item.productId === productId);
+      if (existing) {
+        existing.quantity += 1;
+      } else {
+        state.cart.push({ productId, quantity: 1 });
+      }
+      renderCart();
+      openCart();
+    }
+
+    function removeFromCart(productId) {
+      state.cart = state.cart.filter((item) => item.productId !== productId);
+      renderCart();
+    }
+
+    function changeQuantity(productId, delta) {
+      const item = state.cart.find((i) => i.productId === productId);
+      if (!item) return;
+      item.quantity += delta;
+      if (item.quantity <= 0) {
+        removeFromCart(productId);
+      } else {
+        renderCart();
+      }
+    }
+
+    function openCart() {
+      cartPanel.classList.remove("translate-x-full");
+      cartBackdrop.classList.remove("pointer-events-none");
+      requestAnimationFrame(() => {
+        cartBackdrop.classList.add("opacity-100");
+      });
+    }
+
+    function closeCart() {
+      cartPanel.classList.add("translate-x-full");
+      cartBackdrop.classList.add("pointer-events-none");
+      cartBackdrop.classList.remove("opacity-100");
+    }
+
+    // Obsługa zdarzeń
+    searchInput.addEventListener("input", (e) => {
+      state.search = e.target.value;
+      renderProducts();
+    });
+
+    sortSelect.addEventListener("change", (e) => {
+      state.sort = e.target.value;
+      renderProducts();
+    });
+
+    filterChips.forEach((chip) => {
+      chip.addEventListener("click", () => {
+        const type = chip.getAttribute("data-filter-type");
+        const value = chip.getAttribute("data-filter-value");
+
+        if (type === "category") {
+          state.filters.category = value;
+        } else if (type === "roast") {
+          state.filters.roast = state.filters.roast === value ? null : value;
+        } else if (type === "feature") {
+          state.filters.feature = state.filters.feature === value ? null : value;
+        }
+
+        filterChips.forEach((c) => {
+          const cType = c.getAttribute("data-filter-type");
+          const cValue = c.getAttribute("data-filter-value");
+          c.classList.remove("border-amber-700", "bg-amber-50", "text-amber-900");
+
+          if (
+            (cType === "category" && state.filters.category === cValue) ||
+            (cType === "roast" && state.filters.roast === cValue) ||
+            (cType === "feature" && state.filters.feature === cValue)
+          ) {
+            c.classList.add("border-amber-700", "bg-amber-50", "text-amber-900");
+          }
+
+          if (cType === "category" && cValue === "all" && state.filters.category === "all") {
+            c.classList.add("border-amber-700", "bg-amber-50", "text-amber-900");
+          }
+        });
+
+        renderProducts();
+      });
+    });
+
+    productsGrid.addEventListener("click", (e) => {
+      const button = e.target.closest("button[data-add-to-cart]");
+      if (!button) return;
+      const id = parseInt(button.getAttribute("data-add-to-cart"), 10);
+      addToCart(id);
+    });
+
+    cartItemsContainer.addEventListener("click", (e) => {
+      const removeBtn = e.target.closest("button[data-remove-from-cart]");
+      const incBtn = e.target.closest("button[data-qty-inc]");
+      const decBtn = e.target.closest("button[data-qty-dec]");
+
+      if (removeBtn) {
+        const id = parseInt(removeBtn.getAttribute("data-remove-from-cart"), 10);
+        removeFromCart(id);
+      } else if (incBtn) {
+        const id = parseInt(incBtn.getAttribute("data-qty-inc"), 10);
+        changeQuantity(id, 1);
+      } else if (decBtn) {
+        const id = parseInt(decBtn.getAttribute("data-qty-dec"), 10);
+        changeQuantity(id, -1);
+      }
+    });
+
+    openCartBtn.addEventListener("click", openCart);
+    closeCartBtn.addEventListener("click", closeCart);
+    cartBackdrop.addEventListener("click", closeCart);
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        closeCart();
+      }
+    });
+
+    checkoutBtn.addEventListener("click", () => {
+      alert("To jest wersja demonstracyjna. Dodaj tutaj logikę przejścia do zamówienia.");
+    });
+
+    // Rok w stopce
+    yearSpan.textContent = new Date().getFullYear();
+
+    // Inicjalizacja
+    renderProducts();
+    renderCart();
+  </script>
+</body>
+</html>
